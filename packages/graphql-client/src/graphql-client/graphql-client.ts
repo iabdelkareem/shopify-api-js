@@ -22,10 +22,10 @@ import {
   BOUNDARY_HEADER_REGEX,
 } from "./constants";
 import {
+  formatErrorMessage,
   getErrorMessage,
   validateRetries,
   getKeyValueIfValid,
-  formatErrorMessage,
   buildDataObjectByPath,
   buildCombinedDataObject,
   getErrorCause,
@@ -140,7 +140,9 @@ function generateRequest(
   return async (...props) => {
     if (DEFER_OPERATION_REGEX.test(props[0])) {
       throw new Error(
-        `${CLIENT}: This operation will result in a streamable response - use requestStream() instead.`,
+        formatErrorMessage(
+          "This operation will result in a streamable response - use requestStream() instead.",
+        ),
       );
     }
 
@@ -186,8 +188,9 @@ async function* getStreamBodyIterator(
   response: Response,
 ): AsyncIterableIterator<string> {
   if ((response.body as any)![Symbol.asyncIterator]) {
-    for await (const chunk of response.body! as any)
+    for await (const chunk of response.body! as any) {
       yield (chunk as Buffer).toString();
+    }
   } else {
     const reader = response.body!.getReader();
     const decoder = new TextDecoder();
@@ -244,7 +247,7 @@ function readStreamChunk(
         }
       } catch (error) {
         throw new Error(
-          `${CLIENT}: Error occured while processing stream payload - ${getErrorMessage(
+          `Error occured while processing stream payload - ${getErrorMessage(
             error,
           )}`,
         );
@@ -253,8 +256,12 @@ function readStreamChunk(
   };
 }
 
-function isNotEmpty(obj: { [key: string]: any }) {
-  return Object.keys(obj).length > 0;
+function getResponseData(data: { [key: string]: any }) {
+  return Object.keys(data).length > 0 ? { data } : {};
+}
+
+function getResponseExtensions(extensions?: { [key: string]: any }) {
+  return extensions ? { extensions } : {};
 }
 
 function generateRequestStream(
@@ -263,7 +270,9 @@ function generateRequestStream(
   return async (...props) => {
     if (!DEFER_OPERATION_REGEX.test(props[0])) {
       throw new Error(
-        `${CLIENT}: This operation does not result in a streamable response - use request() instead.`,
+        formatErrorMessage(
+          "This operation does not result in a streamable response - use request() instead.",
+        ),
       );
     }
 
@@ -311,7 +320,7 @@ function generateRequestStream(
         !(response.body as any)![Symbol.asyncIterator]
       ) {
         throw new Error(
-          `${CLIENT}: API multipart response did not return an iterable body`,
+          "API multipart response did not return an iterable body",
           { cause: response },
         );
       }
@@ -332,7 +341,15 @@ function generateRequestStream(
             )) {
               const dataArray = chunkBodies
                 .map((value) => {
-                  return JSON.parse(value);
+                  try {
+                    return JSON.parse(value);
+                  } catch (error) {
+                    throw new Error(
+                      `Error in parsing multipart response - ${getErrorMessage(
+                        error,
+                      )}`,
+                    );
+                  }
                 })
                 .map((payload) => {
                   const { data, path, hasNext, extensions, errors } = payload;
@@ -355,7 +372,7 @@ function generateRequestStream(
                 responseExtensions;
 
               const responseErrors = dataArray
-                .map((datum) => datum.errors)
+                .map(({ errors }) => errors)
                 .filter((errors) => errors && errors.length > 0)
                 .flat();
 
@@ -374,29 +391,31 @@ function generateRequestStream(
                 });
               }
 
+              if (Object.keys(combinedData).length === 0) {
+                throw new Error(
+                  "API multipart response did not contain a data object",
+                );
+              }
+
               yield {
-                ...(isNotEmpty(combinedData) ? { data: combinedData } : {}),
-                ...(responseExtensions
-                  ? { extensions: responseExtensions }
-                  : {}),
+                ...getResponseData(combinedData),
+                ...getResponseExtensions(responseExtensions),
                 hasNext: streamHasNext,
               };
             }
 
             if (streamHasNext) {
-              throw new Error(
-                `${CLIENT}: Response stream terminated unexpectedly`,
-              );
+              throw new Error(`Response stream terminated unexpectedly`);
             }
           } catch (error) {
             const cause = getErrorCause(error);
 
             yield {
-              ...(isNotEmpty(combinedData) ? { data: combinedData } : {}),
-              ...(responseExtensions ? { extensions: responseExtensions } : {}),
+              ...getResponseData(combinedData),
+              ...getResponseExtensions(responseExtensions),
               error: {
                 networkStatusCode: status,
-                message: getErrorMessage(error),
+                message: formatErrorMessage(getErrorMessage(error)),
                 ...(cause.graphQLErrors
                   ? { graphQLErrors: cause.graphQLErrors }
                   : {}),
@@ -416,7 +435,7 @@ function generateRequestStream(
           yield {
             error: {
               ...(cause.status ? { networkStatusCode: cause.status } : {}),
-              message: getErrorMessage(error),
+              message: formatErrorMessage(getErrorMessage(error)),
             },
             hasNext: false,
           };
