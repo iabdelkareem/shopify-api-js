@@ -4,7 +4,6 @@ import {
   CustomFetchApi,
   GraphQLClient,
   ClientResponse,
-  ClientStreamResponse,
   ClientConfig,
   Logger,
   LogContentTypes,
@@ -323,7 +322,7 @@ function generateRequestStream(
       let combinedData: { [key: string]: any } = {};
       let responseExtensions: { [key: string]: any } | undefined;
 
-      const iteratorResponse: ClientStreamResponse = {
+      return {
         async *[Symbol.asyncIterator]() {
           try {
             let streamHasNext = true;
@@ -419,8 +418,6 @@ function generateRequestStream(
           }
         },
       };
-
-      return iteratorResponse;
     } catch (error) {
       return {
         async *[Symbol.asyncIterator]() {

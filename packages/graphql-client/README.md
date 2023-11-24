@@ -79,6 +79,15 @@ const client = createGraphQLClient({
 | errors?      | [`ResponseErrors`](#responseerrors)       | Errors object that contains any API or network errors that occured while fetching the data from the API. It does not include any `UserErrors`.                                                       |
 | extensions? | `{[key: string]: any}` | Additional information on the GraphQL response data and context. It can include the `context` object that contains the context settings used to generate the returned API response. |
 
+## `ClientStreamResponse<TData>`
+
+| Name        | Type                    | Description                                                                                                                                                                                         |
+| ----------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| data?       | `Partial<TData> \| any` | Currently available data returned from the Storefront API. If `TData` was provided to the function, the return type is `TData`, else it returns type `any`.                                         |
+| errors?      | [`ResponseErrors`](#responseerrors)           | Errors object that contains any API or network errors that occured while fetching the data from the API. It does not include any `UserErrors`.                                                       |
+| extensions? | `{[key: string]: any}` | Additional information on the GraphQL response data and context. It can include the `context` object that contains the context settings used to generate the returned API response. |
+| hasNext     | `boolean`               | Flag to indicate whether the response stream has more incoming data                                                                                                                                 |
+
 ## `ResponseErrors`
 
 | Name        | Type                  | Description                                                                                                                                                                                         |
@@ -87,7 +96,6 @@ const client = createGraphQLClient({
 | message?      | `string`       | The provided error message                                                       |
 | graphQLErrors? | `any[]` | The GraphQL API errors returned by the server |
 | response? | `Response` | The raw response object from the network fetch call |
-
 
 ## Usage examples
 
@@ -109,6 +117,32 @@ const {data, errors, extensions} = await client.request(productQuery, {
     handle: 'sample-product',
   },
 });
+```
+
+### Query for product info using the `@defer` directive
+
+```typescript
+const productQuery = `
+  query ProductQuery($handle: String) {
+    product(handle: $handle) {
+      id
+      handle
+      ... @defer(label: "deferredFields") {
+        title
+        description
+      }
+    }
+  }
+`;
+
+const responseStream = await client.requestStream(productQuery, {
+  variables: {handle: 'sample-product'},
+});
+
+// await available data from the async iterator
+for await (const response of responseStream) {
+  const {data, errors, extensions, hasNext} = response;
+}
 ```
 
 ### Add additional custom headers to the API request
@@ -173,14 +207,15 @@ const {data, errors, extensions} = await client.request(shopQuery, {
 });
 ```
 
-### Provide GQL query type to `client.request()`
+### Provide GQL query type to `client.request()` and `client.requestStream()`
 
 ```typescript
 import {print} from 'graphql/language';
 
 // GQL operation types are usually auto generated during the application build
-import {CollectionQuery} from 'types/appTypes';
+import {CollectionQuery, CollectionDeferredQuery} from 'types/appTypes';
 import collectionQuery from './collectionQuery.graphql';
+import collectionDeferredQuery from './collectionDeferredQuery.graphql';
 
 const {data, errors, extensions} = await client.request<CollectionQuery>(
   print(collectionQuery),
@@ -188,6 +223,13 @@ const {data, errors, extensions} = await client.request<CollectionQuery>(
     variables: {
       handle: 'sample-collection',
     },
+  }
+);
+
+const responseStream = await client.requestStream<CollectionDeferredQuery>(
+  print(collectionDeferredQuery),
+  {
+    variables: {handle: 'sample-collection'},
   }
 );
 ```
