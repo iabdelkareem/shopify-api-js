@@ -42,6 +42,10 @@ export interface ClientStreamResponse<TData = unknown>
   hasNext: boolean;
 }
 
+export interface ClientStreamIterator<TData = unknown> {
+  [Symbol.asyncIterator](): AsyncIterator<ClientStreamResponse<TData>>;
+}
+
 export interface LogContent {
   type: string;
   content: any;
@@ -102,7 +106,5 @@ export interface GraphQLClient {
   ) => Promise<ClientResponse<TData>>;
   requestStream: <TData = unknown>(
     ...props: RequestParams
-  ) => Promise<{
-    [Symbol.asyncIterator](): AsyncIterator<ClientStreamResponse<TData>>;
-  }>;
+  ) => Promise<ClientStreamIterator<TData>>;
 }
