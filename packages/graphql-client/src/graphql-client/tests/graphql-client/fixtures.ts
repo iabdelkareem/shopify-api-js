@@ -3,8 +3,8 @@ import { Readable } from "stream";
 
 import { ReadableStream } from "web-streams-polyfill/es2018";
 
-import { createGraphQLClient } from "../graphql-client";
-import { LogContentTypes, ClientOptions } from "../types";
+import { createGraphQLClient } from "../../graphql-client";
+import { LogContentTypes, ClientOptions } from "../../types";
 
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder as any;
@@ -15,6 +15,18 @@ export const clientConfig = {
     "Content-Type": "application/json",
     "X-Shopify-Storefront-Access-Token": "public-token",
   },
+};
+
+export const operation = `
+query {
+  shop {
+    name
+  }
+}
+`;
+
+export const variables = {
+  country: "US",
 };
 
 export function getValidClient({
@@ -47,7 +59,7 @@ const streamResponseConfig = {
 
 function createReadableStream(
   responseArray: string[],
-  stringEncoder?: (str: any) => Uint8Array
+  stringEncoder?: (str: any) => Uint8Array,
 ) {
   return new ReadableStream({
     start(controller) {

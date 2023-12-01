@@ -227,6 +227,18 @@ describe("buildCombinedDataObject()", () => {
       },
     });
   });
+
+  it("returns an object with an array that is the combination of multiple arrays", () => {
+    const obj1 = { t1: [{ a1: "a1" }, { a2: "a2" }] };
+    const obj2 = { t1: [{ b1: "b1" }, { a3: "a3" }] };
+
+    expect(buildCombinedDataObject([obj1, obj2])).toEqual({
+      t1: [
+        { a1: "a1", b1: "b1" },
+        { a2: "a2", a3: "a3" },
+      ],
+    });
+  });
 });
 
 describe("getKeyValueIfValid()", () => {
