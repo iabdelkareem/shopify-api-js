@@ -104,7 +104,7 @@ export interface GraphQLClient {
   request: <TData = any>(
     ...props: RequestParams
   ) => Promise<ClientResponse<TData>>;
-  requestStream: <TData = unknown>(
+  requestStream: <TData = any>(
     ...props: RequestParams
   ) => Promise<ClientStreamIterator<TData>>;
 }

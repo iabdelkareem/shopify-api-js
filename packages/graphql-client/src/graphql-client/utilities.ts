@@ -8,8 +8,8 @@ export function getErrorMessage(error: any) {
   return error instanceof Error ? error.message : JSON.stringify(error);
 }
 
-export function getErrorCause(error: any): { [key: string]: any } {
-  return error instanceof Error && error.cause ? error.cause : {};
+export function getErrorCause(error: any): { [key: string]: any } | undefined {
+  return error instanceof Error && error.cause ? error.cause : undefined;
 }
 
 export function validateRetries({

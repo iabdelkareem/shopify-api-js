@@ -47,14 +47,14 @@ describe("getErrorCause()", () => {
     expect(getErrorCause(new Error(...params))).toBe(cause);
   });
 
-  it("returns an empty object if there is no cause object in the provided error object", () => {
+  it("returns an undefined if there is no cause object in the provided error object", () => {
     const message = "Test error";
 
-    expect(getErrorCause(new Error(message))).toEqual({});
+    expect(getErrorCause(new Error(message))).toBeUndefined();
   });
 
-  it("returns an empty object if the provided object is not an error object", () => {
-    expect(getErrorCause({ message: "test" })).toEqual({});
+  it("returns an undefined if the provided object is not an error object", () => {
+    expect(getErrorCause({ message: "test" })).toBeUndefined();
   });
 });
 

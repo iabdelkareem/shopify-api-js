@@ -59,6 +59,7 @@ describe("GraphQL Client", () => {
     describe("calling the function", () => {
       describe("fetch parameters", () => {
         parametersTests("requestStream", operation);
+
         it("throws an error if the operation does not include the defer directive", async () => {
           const customOperation = `
               query {
@@ -102,6 +103,7 @@ describe("GraphQL Client", () => {
             expect(response).toHaveProperty("errors", {
               networkStatusCode: responseConfig.status,
               message: `GraphQL Client: ${responseConfig.statusText}`,
+              response: mockedFailedResponse,
             });
           }
         });
@@ -147,6 +149,7 @@ describe("GraphQL Client", () => {
               expect(response).toHaveProperty("errors", {
                 networkStatusCode: mockedSuccessResponse.status,
                 message: `GraphQL Client: Response returned unexpected Content-Type: ${contentType}`,
+                response: mockedSuccessResponse,
               });
             }
           });
@@ -262,6 +265,7 @@ describe("GraphQL Client", () => {
                 message:
                   "GraphQL Client: An error occurred while fetching from the API. Review 'graphQLErrors' for details.",
                 graphQLErrors: gqlError,
+                response: mockedSuccessResponse,
               });
             }
           });
@@ -289,6 +293,7 @@ describe("GraphQL Client", () => {
                 networkStatusCode: mockedSuccessResponse.status,
                 message:
                   "GraphQL Client: An unknown error has occurred. The API did not return a data object or any errors in its response.",
+                response: mockedSuccessResponse,
               });
             }
           });
@@ -596,6 +601,7 @@ describe("GraphQL Client", () => {
                     networkStatusCode: 200,
                     message:
                       "GraphQL Client: Response stream terminated unexpectedly",
+                    response: mockedSuccessResponse,
                   });
 
                   expect(results[0].data).toBeUndefined();
@@ -637,6 +643,7 @@ describe("GraphQL Client", () => {
                     networkStatusCode: 200,
                     message:
                       "GraphQL Client: Response stream terminated unexpectedly",
+                    response: mockedSuccessResponse,
                   });
                 });
               });
@@ -725,6 +732,7 @@ describe("GraphQL Client", () => {
                   message:
                     "GraphQL Client: An error occurred while fetching from the API. Review 'graphQLErrors' for details.",
                   graphQLErrors: errors,
+                  response: mockedSuccessResponse,
                 });
 
                 expect(results[0].data).toBeUndefined();
@@ -781,6 +789,7 @@ describe("GraphQL Client", () => {
                   message:
                     "GraphQL Client: An error occurred while fetching from the API. Review 'graphQLErrors' for details.",
                   graphQLErrors: errors,
+                  response: mockedSuccessResponse,
                 });
               });
 
@@ -815,6 +824,7 @@ describe("GraphQL Client", () => {
                   networkStatusCode: 200,
                   message:
                     "GraphQL Client: An unknown error has occurred. The API did not return a data object or any errors in its response.",
+                  response: mockedSuccessResponse,
                 });
               });
             });

@@ -351,13 +351,11 @@ function generateRequestStream(
                 .map((payload) => {
                   const { data, path, hasNext, extensions, errors } = payload;
 
-                  const payloadData =
-                    data && path
-                      ? buildDataObjectByPath(path, data)
-                      : data || {};
-
                   return {
-                    data: payloadData,
+                    data:
+                      data && path
+                        ? buildDataObjectByPath(path, data)
+                        : data || {},
                     ...getKeyValueIfValid("errors", errors),
                     ...getKeyValueIfValid("extensions", extensions),
                     hasNext,
@@ -411,7 +409,8 @@ function generateRequestStream(
               errors: {
                 networkStatusCode: status,
                 message: formatErrorMessage(getErrorMessage(error)),
-                ...getKeyValueIfValid("graphQLErrors", cause.graphQLErrors),
+                ...getKeyValueIfValid("graphQLErrors", cause?.graphQLErrors),
+                response,
               },
               hasNext: false,
             };
@@ -421,12 +420,13 @@ function generateRequestStream(
     } catch (error) {
       return {
         async *[Symbol.asyncIterator]() {
-          const cause = getErrorCause(error);
+          const response = getErrorCause(error);
 
           yield {
             errors: {
-              ...getKeyValueIfValid("networkStatusCode", cause.status),
+              ...getKeyValueIfValid("networkStatusCode", response?.status),
               message: formatErrorMessage(getErrorMessage(error)),
+              ...getKeyValueIfValid("response", response),
             },
             hasNext: false,
           };

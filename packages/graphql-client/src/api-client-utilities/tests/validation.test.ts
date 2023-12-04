@@ -142,7 +142,11 @@ describe("validateRequiredApiVersion()", () => {
     });
 
     expect(consoleWarnSpy).toHaveBeenCalledWith(
+<<<<<<< HEAD
       `${client}: the provided apiVersion ("${apiVersion}") is likely deprecated or not supported. Currently supported API versions: ${mockApiVersions.join(
+=======
+      `${client}: the provided apiVersion ("${apiVersion}") is likely deprecated or not supported. Current supported API versions: ${mockApiVersions.join(
+>>>>>>> 6aa85d71 (Refactor unit tests and update api version validation)
         ", ",
       )}`,
     );

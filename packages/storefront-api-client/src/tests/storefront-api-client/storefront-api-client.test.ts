@@ -413,7 +413,7 @@ describe("Storefront API Client", () => {
           client.getApiUrl(version);
 
           expect(consoleWarnSpy).toHaveBeenCalledWith(
-            `Storefront API Client: the provided apiVersion ("2021-01") is deprecated or not supported. Current supported API versions: ${mockApiVersions.join(
+            `Storefront API Client: the provided apiVersion ("2021-01") is likely deprecated or not supported. Current supported API versions: ${mockApiVersions.join(
               ", ",
             )}`,
           );
