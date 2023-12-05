@@ -37,12 +37,12 @@ export interface ClientResponse<TData = any> extends FetchResponseBody<TData> {
   errors?: ResponseErrors;
 }
 
-export interface ClientStreamResponse<TData = unknown>
+export interface ClientStreamResponse<TData = any>
   extends ClientResponse<TData> {
   hasNext: boolean;
 }
 
-export interface ClientStreamIterator<TData = unknown> {
+export interface ClientStreamIterator<TData = any> {
   [Symbol.asyncIterator](): AsyncIterator<ClientStreamResponse<TData>>;
 }
 

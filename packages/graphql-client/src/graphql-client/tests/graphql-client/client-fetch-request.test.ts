@@ -44,6 +44,7 @@ describe("GraphQL Client", () => {
 
       describe("retries", () => {
         retryTests(functionName);
+
         describe("Aborted fetch responses", () => {
           it("calls the global fetch 1 time and throws a plain error when the client retries value is 0", async () => {
             fetchMock.mockAbort();
@@ -163,6 +164,7 @@ describe("GraphQL Client", () => {
             const response = await client.fetch(operation);
 
             expect(response.status).toBe(status);
+            expect(response.statusText).toBe(statusText);
             expect(fetchMock).toHaveBeenCalledTimes(1);
           });
 
@@ -173,6 +175,7 @@ describe("GraphQL Client", () => {
             const response = await client.fetch(operation);
 
             expect(response.status).toBe(status);
+            expect(response.statusText).toBe(statusText);
             expect(fetchMock).toHaveBeenCalledTimes(2);
           });
 
@@ -181,6 +184,7 @@ describe("GraphQL Client", () => {
             const response = await client.fetch(operation, { retries: 2 });
 
             expect(response.status).toBe(status);
+            expect(response.statusText).toBe(statusText);
             expect(fetchMock).toHaveBeenCalledTimes(3);
           });
 

@@ -7,7 +7,6 @@ import {
   getErrorCause,
   buildCombinedDataObject,
   buildDataObjectByPath,
-  getKeyValueIfValid,
 } from "../utilities";
 
 describe("formatErrorMessage()", () => {

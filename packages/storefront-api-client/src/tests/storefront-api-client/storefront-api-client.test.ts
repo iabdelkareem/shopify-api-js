@@ -397,7 +397,7 @@ describe("Storefront API Client", () => {
           const version = 123;
           expect(() => client.getApiUrl(version as any)).toThrow(
             new Error(
-              `Storefront API Client: the provided apiVersion ("123") is invalid. Current supported API versions: ${mockApiVersions.join(
+              `Storefront API Client: the provided apiVersion ("123") is invalid. Currently supported API versions: ${mockApiVersions.join(
                 ", ",
               )}`,
             ),
@@ -413,7 +413,7 @@ describe("Storefront API Client", () => {
           client.getApiUrl(version);
 
           expect(consoleWarnSpy).toHaveBeenCalledWith(
-            `Storefront API Client: the provided apiVersion ("2021-01") is likely deprecated or not supported. Current supported API versions: ${mockApiVersions.join(
+            `Storefront API Client: the provided apiVersion ("2021-01") is likely deprecated or not supported. Currently supported API versions: ${mockApiVersions.join(
               ", ",
             )}`,
           );
