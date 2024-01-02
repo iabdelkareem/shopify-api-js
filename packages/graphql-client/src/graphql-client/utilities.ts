@@ -8,7 +8,7 @@ export function getErrorMessage(error: any) {
   return error instanceof Error ? error.message : JSON.stringify(error);
 }
 
-export function getErrorCause(error: any): { [key: string]: any } | undefined {
+export function getErrorCause(error: any): Record<string, any> | undefined {
   return error instanceof Error && error.cause ? error.cause : undefined;
 }
 
@@ -43,7 +43,7 @@ export function getKeyValueIfValid(key: string, value?: any) {
 export function buildDataObjectByPath(
   path: string[],
   data: any,
-): { [key: string | number]: any } {
+): Record<string | number, any> {
   if (path.length === 0) {
     return data;
   }

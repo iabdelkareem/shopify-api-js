@@ -318,8 +318,8 @@ function generateRequestStream(
 
       const streamBodyIterator = getStreamBodyIterator(response);
 
-      let combinedData: { [key: string]: any } = {};
-      let responseExtensions: { [key: string]: any } | undefined;
+      let combinedData: Record<string, any> = {};
+      let responseExtensions: Record<string, any> | undefined;
 
       return {
         async *[Symbol.asyncIterator]() {
