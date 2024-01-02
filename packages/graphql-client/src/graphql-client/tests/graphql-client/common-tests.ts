@@ -34,7 +34,7 @@ export const fetchApiTests = (
 
     const client = createGraphQLClient({
       ...clientConfig,
-      fetchApi: customFetchApi,
+      customFetchApi,
     });
 
     const props: [string] = [gqlOperation];
